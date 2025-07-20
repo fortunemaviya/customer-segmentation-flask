@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Segmentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; background-color: #f8f9fa; }
+        .container { max-width: 800px; }
+        .header { margin-bottom: 30px; text-align: center; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .error { color: #dc3545; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="text-primary">🧠 Customer Segmentation</h1>
+            <p class="lead">Upload your customer data to generate clusters using K-Means</p>
+        </div>
+        
+        <div class="form-container">
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            
+            <form method="post" enctype="multipart/form-data" action="/segment">
+                <div class="mb-3">
+                    <label for="file" class="form-label">Customer Data (CSV)</label>
+                    <input class="form-control" type="file" name="file" accept=".csv" required>
+                    <div class="form-text">
+                        Ensure CSV contains "Annual Income" and "Spending Score" columns
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="k" class="form-label">Number of Clusters (K)</label>
+                    <input class="form-control" type="number" name="k" value="5" min="2" max="10" required>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" name="save_model" id="save_model">
+                    <label class="form-check-label" for="save_model">Save trained model</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">Segment Customers</button>
+            </form>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p class="text-muted">
+                Sample CSV format:<br>
+                <small>CustomerID, Gender, Age, Annual Income (k$), Spending Score (1-100)</small>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

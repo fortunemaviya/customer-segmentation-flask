@@ -1,0 +1,20 @@
+# Ignore Python cache and venv
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+.env
+*.log
+
+# Ignore OS/IDE clutter
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+
+# Ignore model or data files (optional)
+*.pkl
+*.csv
+uploads/
+static/cluster_plot.png

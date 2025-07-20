@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segmentation Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --success: #1cc88a;
+            --info: #36b9cc;
+            --dark: #5a5c69;
+        }
+        
+        body { 
+            padding: 20px; 
+            background-color: #f8f9fa;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .container { max-width: 1400px; }
+        
+        .header { 
+            margin-bottom: 30px; 
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card { 
+            margin-bottom: 25px; 
+            box-shadow: 0 0.15rem 1.75rem rgba(0,0,0,0.1); 
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .table-container { 
+            overflow-x: auto; 
+            padding: 15px;
+        }
+        
+        .cluster-plot {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid #e3e6f0;
+            box-shadow: 0 0.15rem 0.75rem rgba(0,0,0,0.08);
+        }
+        
+        .stats-card .card-body {
+            padding: 0;
+        }
+        
+        .stat-badge {
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 5px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 30px;
+            margin: 5px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        }
+        
+        .cluster-card {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .cluster-1 { border-left-color: #4e73df; }
+        .cluster-2 { border-left-color: #1cc88a; }
+        .cluster-3 { border-left-color: #36b9cc; }
+        .cluster-4 { border-left-color: #f6c23e; }
+        .cluster-5 { border-left-color: #e74a3b; }
+        
+        .cluster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cluster-size {
+            background-color: #eaecf4;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        
+        .progress {
+            height: 10px;
+            margin: 10px 0;
+        }
+        
+        .feature-name {
+            font-weight: 700;
+            color: var(--dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-chart-pie me-2"></i>Customer Segmentation Results</h1>
+            <p class="lead mb-0">K-Means Clustering Analysis (K = {{ k }})</p>
+        </div>
+        
+        <div class="row">
+            <!-- Cluster Visualization -->
+            <div class="col-lg-7 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-chart-scatter me-2"></i>Cluster Visualization</span>
+                        <span class="badge bg-light text-dark">Income vs Spending</span>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ plot_url }}" class="img-fluid cluster-plot" alt="Cluster Plot">
+                        <div class="mt-3 d-flex flex-wrap justify-content-center">
+                            {% for i in range(k) %}
+                            <span class="stat-badge" style="background-color: {{ cluster_colors[i] }}; color: white;">
+                                Cluster {{ i }} ({{ cluster_sizes[i] }})
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Summary Stats & Actions -->
+            <div class="col-lg-5 mb-4">
+                <!-- Summary Statistics -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <i class="fas fa-chart-bar me-2"></i>Overall Statistics
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-6 mb-3">
+                                <div class="text-dark mb-1">Total Customers</div>
+                                <div class="h3 text-primary">{{ total_customers }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-dark mb-1">Avg. Income</div>
+                                <div class="h3 text-success">${{ avg_income }}k</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-dark mb-1">Avg. Spending Score</div>
+                                <div class="h3 text-warning">{{ avg_score }}/100</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-dark mb-1">Clusters Generated</div>
+                                <div class="h3 text-danger">{{ k }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <i class="fas fa-cogs me-2"></i>Actions
+                    </div>
+                    <div class="card-body text-center">
+                        <a href="/download" class="btn btn-success action-btn">
+                            <i class="fas fa-download me-2"></i>Download Full Results
+                        </a>
+                        <a href="/" class="btn btn-outline-primary action-btn">
+                            <i class="fas fa-redo me-2"></i>Analyze Another
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cluster Summary Statistics -->
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-table me-2"></i>Cluster Summary Statistics
+                    </div>
+                    <div class="table-container">
+                        {{ stats|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cluster Details -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <i class="fas fa-users me-2"></i>Cluster Characteristics
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for cluster in cluster_details %}
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100 cluster-card cluster-{{ loop.index }}">
+                                    <div class="card-header bg-light">
+                                        <div class="cluster-header">
+                                            <h5 class="mb-0">Cluster {{ loop.index0 }}</h5>
+                                            <span class="cluster-size">{{ cluster.size }} customers</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <div class="feature-name">Annual Income (k$)</div>
+                                            <div class="d-flex justify-content-between">
+                                                <small>Avg: ${{ cluster.income_avg }}</small>
+                                                <small>Range: ${{ cluster.income_min }}-${{ cluster.income_max }}</small>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-primary" 
+                                                     style="width: {{ cluster.income_pct }}%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <div class="feature-name">Spending Score</div>
+                                            <div class="d-flex justify-content-between">
+                                                <small>Avg: {{ cluster.score_avg }}/100</small>
+                                                <small>Range: {{ cluster.score_min }}-{{ cluster.score_max }}</small>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" 
+                                                     style="width: {{ cluster.score_pct }}%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <div class="feature-name">Profile</div>
+                                            <p class="mb-1 small">{{ cluster.profile }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Preview -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <i class="fas fa-eye me-2"></i>Data Preview ({{ sample_size }} of {{ total_customers }} records)
+                    </div>
+                    <div class="table-container">
+                        {{ tables[0]|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center text-muted">
+            <p><i class="fas fa-code me-2"></i>K-Means clustering performed with scikit-learn | Flask Application</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
