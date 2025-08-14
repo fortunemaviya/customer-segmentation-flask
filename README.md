@@ -6,7 +6,11 @@
 
 This Flask application performs customer segmentation using K-Means clustering. Users can upload customer data in CSV format, specify the number of clusters, and visualize the results.
 
-![Screenshot](static/screenshot.png)
+<img width="1895" height="952" alt="image" src="https://github.com/user-attachments/assets/168aebaf-4fb3-48dd-84d1-0a66c960dc82" />
+<img width="1891" height="873" alt="image" src="https://github.com/user-attachments/assets/5312402a-f0d3-468c-b8f0-cfff14f5d63a" />
+
+the above results are easily interpretable for business cases therefore making it vital for businesses in their bid to understand the market and how to tailr products in that regards.
+
 
 ## Features
 
