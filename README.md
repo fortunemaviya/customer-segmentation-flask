@@ -9,7 +9,7 @@ This Flask application performs customer segmentation using K-Means clustering. 
 <img width="1895" height="952" alt="image" src="https://github.com/user-attachments/assets/168aebaf-4fb3-48dd-84d1-0a66c960dc82" />
 <img width="1891" height="873" alt="image" src="https://github.com/user-attachments/assets/5312402a-f0d3-468c-b8f0-cfff14f5d63a" />
 
-the above results are easily interpretable for business cases therefore making it vital for businesses in their bid to understand the market and how to tailr products in that regards.
+the above results are easily interpretable for business cases therefore making it vital for businesses in their bid to understand the market and how to tailor products in that regards.
 
 
 ## Features
@@ -38,7 +38,7 @@ customer-segmentation-flask/
 ## Installation
 
 ```bash
-git clone https://github.com/<your-username>/customer-segmentation-flask.git
+git clone https://github.com/fortunemaviya/customer-segmentation-flask.git
 cd customer-segmentation-flask
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
